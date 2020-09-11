@@ -1,0 +1,20 @@
+program: train.py
+method: grid
+metric:
+  name: loss
+  goal: minimize
+parameters:
+  GPUs:
+    value: "0"
+  epochs:
+    value: 10
+  freeze:
+    values: [0, 1]
+  dropout:
+    values: [0.1, 0.2, 0.4, 0.5, 0.7]
+  batch_size:
+    values: [64, 128, 256]
+  model_name:
+    values: [mobilenet, mobilenetv2]
+  learning_rate:
+    values: [0.001, 0.005, 0.0005]
