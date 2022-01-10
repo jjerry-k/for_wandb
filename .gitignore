@@ -3,3 +3,6 @@ logs
 wandb
 settings
 .vscode
+data
+data.zip
+result
