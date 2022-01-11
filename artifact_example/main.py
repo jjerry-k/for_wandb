@@ -20,10 +20,10 @@ def data_version_control(config):
             run.log_artifact(artifact)
             run.finish()
 
-def model_version_control(config):
-    with wandb.init(entity="jjerry", job_type="mvc", project="TestArtifact", name=config["runtime_name"]) as run:
-        artifact = wandb.Artifact(name=f'{config["model_name"]}_train', type="model")
-        run.use_artifact(f'{config["dataset_name"]}:latest')
+def model_version_control(config, mode):
+    with wandb.init(entity="jjerry", job_type="mvc", project="TestArtifact") as run:
+        artifact = wandb.Artifact(name=f'{config["model_name"]}', type="model")
+        run.use_artifact(f'{mode}_dataset:latest')
         artifact.add_dir(config["ckpt_path"])
         run.log_artifact(artifact)
         run.finish()
@@ -38,21 +38,25 @@ config = {
 }
 config.update({"ckpt_path": f"./result/{config['runtime_name']}"})
 
-start = time.time()
-data_version_control(config)
-print(f"DVC Elapsed Time: {time.time() - start}")
-
-
-# net = model.Model(config["model_name"])
-
-# utils.save_checkpoint({'epoch': 1,
-#                 'state_dict': net.state_dict()},
-#                 is_best=False,
-#                 checkpoint=config["ckpt_path"])
-
 # start = time.time()
-# model_version_control(config)
-# print(f"MVC Elapsed Time: {time.time() - start}")
+# data_version_control(config)
+# print(f"DVC Elapsed Time: {time.time() - start}")
+
+
+net = model.Model(config["model_name"])
+
+utils.save_checkpoint({'epoch': 1,
+                'state_dict': net.state_dict()},
+                is_best=False,
+                checkpoint=config["ckpt_path"])
+
+start = time.time()
+model_version_control(config, 'train')
+print(f"MVC Elapsed Time: {time.time() - start}")
+
+start = time.time()
+model_version_control(config, 'test')
+print(f"MVC Elapsed Time: {time.time() - start}")
 
 
 # import os
