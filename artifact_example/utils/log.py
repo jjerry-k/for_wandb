@@ -3,12 +3,17 @@ import json
 import logging
 
 def save_dict_to_json(metrics, json_path, is_best=None):
-    encoding = "w" if not os.path.exists(json_path) or is_best else "a"
-
-    with open(json_path, encoding) as f:
-        # We need to convert the values to float for json (it doesn't accept np.array, np.float, )
-        metrics = {key: float(value) for key, value in metrics.items()}
-        json.dump(metrics, f, indent=4)
+    cond = False if (not os.path.exists(json_path)) else True
+    metrics = {key: float(value) for key, value in metrics.items()}
+    if cond:
+        with open(json_path, "r") as tmp_f:
+            data = json.load(tmp_f)
+        data.update({metrics["epoch"]: metrics})
+    else: 
+        data = {metrics["epoch"]: metrics}
+        
+    with open(json_path, "w") as f:
+        json.dump(data, f, indent=4)
 
 def set_logger(path, remove=True):
     
@@ -27,3 +32,20 @@ def set_logger(path, remove=True):
         stream_handler = logging.StreamHandler()
         stream_handler.setFormatter(logging.Formatter('%(message)s'))
         logger.addHandler(stream_handler)
+    
+if __name__ == "__main__": 
+    json_path = '/home/coder/test.json'
+    is_best = True
+    metrics = {"epoch": 2, "test1": 1, "test2": 2}
+    print(not os.path.exists(json_path))
+    cond = False if (not os.path.exists(json_path)) else True
+    metrics = {key: float(value) for key, value in metrics.items()}
+    if cond:
+        with open(json_path, "r") as tmp_f:
+            data = json.load(tmp_f)
+        data.update({metrics["epoch"]: metrics})
+    else: 
+        data = {metrics["epoch"]: metrics}
+
+    with open(json_path, "w") as f:
+        json.dump(data, f, indent=4)
